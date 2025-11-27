@@ -8,14 +8,18 @@ use App\Entity\Recipe;
 use App\Form\CategoryFormType;
 use App\Form\PasswordResetFormType;
 use App\Form\RecipeFormType;
+use App\Form\UploadProfilePictureFormType;
 use App\Repository\RecipeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 final class HomeController extends AbstractController
 {
@@ -101,10 +105,39 @@ final class HomeController extends AbstractController
     }
 
     #[Route('/profile', name: 'app_profile')]
-    public function profile(): Response
+    public function profile(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
+        $form = $this->createForm(UploadProfilePictureFormType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $file = $form->get('profilePicture')->getData();
+
+            if ($file) {
+                $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
+
+                try {
+                    $file->move(
+                        $this->getParameter('profile_pictures_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Failed to upload profile picture');
+                }
+
+                $user = $this->getUser();
+                $user->setProfilePicture($newFilename);
+                $entityManager->flush();
+
+                $this->addFlash('success', 'Profile picture updated!');
+                return $this->redirectToRoute('app_profile');
+            }
+        }
+
         return $this->render('home/profile.html.twig', [
-            'controller_name' => 'HomeController',
+            'form' => $form->createView(),
         ]);
     }
 

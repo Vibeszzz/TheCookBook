@@ -73,15 +73,13 @@
                 <div class="relative">
                     <input type="checkbox" id="profile-menu-toggle" class="peer hidden">
                     <label for="profile-menu-toggle" class="flex items-center cursor-pointer">
-                        {% if app.user.profilePicture %}
-                            <img class="w-8 h-8 rounded-full border-2 border-gray-300"
-                                 src="{{ asset('uploads/profile_pictures/' ~ app.user.profilePicture) }}"
-                                 alt="Profile Picture">
-                        {% else %}
-                            <img class="w-8 h-8 rounded-full bg-white border-2 border-gray-300"
-                                 src="{{ asset('img/default-avatar-profile-vector-user-profile.png') }}"
-                                 alt="No picture">
-                        {% endif %}
+                        <img class="w-8 h-8 rounded-full border-2 border-gray-300"
+                             src="{% if app.user.profilePicture %}
+                                    {{ asset('uploads/profile_pictures/' ~ app.user.profilePicture) }}
+                                {% else %}
+                                    {{ asset('img/default-avatar-profile-vector-user-profile.webp') }}
+                                {% endif %}"
+                             alt="{{ app.user.firstName }}'s Profile Picture">
                     </label>
 
                     <!-- Dropdown Menu -->
@@ -123,7 +121,8 @@
             {% else %}
                 <a href="{{ path('app_login') }}"
                    class="flex items-center space-x-1 bg-white/20 dark:bg-gray-700 text-white dark:text-gray-200 px-3 py-1 rounded-lg hover:bg-white/40 dark:hover:bg-gray-600 transition">
-                    <img src="https://img.icons8.com/ios-glyphs/30/ffffff/login-rounded-right.png" class="w-5 h-5" alt="Login">
+                    <img src="https://img.icons8.com/ios-glyphs/30/ffffff/login-rounded-right.png" class="w-5 h-5"
+                         alt="Login">
                     <span>Login</span>
                 </a>
             {% endif %}

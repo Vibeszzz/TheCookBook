@@ -1,42 +1,67 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div class="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md text-center">
+    <div class="min-h-screen flex items-start justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 space-x-8">
 
-            <!-- Profile Picture -->
-            <div class="flex justify-center mb-4">
-                {% if app.user.profilePicture %}
-                    <img src="{{ asset('uploads/profilePictures/' ~ app.user.profilePicture) }}"
-                         alt="{{ app.user.firstName }}'s Profile Picture"
-                         class="w-32 h-32 rounded-full object-cover border-4 border-blue-400">
-                {% else %}
-                    <img src="{{ asset('img/default-avatar-profile-vector-user-profile.webp') }}"
-                         alt="Default Profile Picture"
-                         class="w-32 h-32 rounded-full object-cover border-4 border-blue-400">
-                {% endif %}
+        <!-- Left: User Profile Card -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 w-80 flex flex-col items-center">
+            <img src="{{ app.user.profilePicture ? asset('uploads/profile_pictures/' ~ app.user.profilePicture) : asset('img/default-avatar-profile-vector-user-profile.webp') }}"
+                 alt="{{ app.user.firstName }}'s Profile Picture"
+                 class="w-32 h-32 rounded-full object-cover border-2 border-gray-300 mb-4">
+
+            <h2 class="text-xl font-semibold text-gray-900">{{ app.user.firstName }} {{ app.user.lastName }}</h2>
+            <p class="text-gray-500 text-sm">{{ app.user.email }}</p>
+
+            <div class="mt-4 w-full">
+                <div class="flex justify-between text-sm text-gray-600">
+                    <span>Recipes:</span>
+                    <span>{{ app.user.recipes|length }}</span>
+                </div>
+                <div class="flex justify-between text-sm text-gray-600 mt-1">
+                    <span>Comments:</span>
+                    <span>{{ app.user.comments|length }}</span>
+                </div>
+                <div class="flex justify-between text-sm text-gray-600 mt-1">
+                    <span>Ratings:</span>
+                    <span>{{ app.user.ratings|length }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Upload Card -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 w-64 flex flex-col items-center">
+
+            <h2 class="text-lg font-semibold text-gray-900 mb-2 text-center">Nieuwe Profielfoto</h2>
+            <p class="text-xs text-gray-500 mb-4 text-center">JPEG, PNG of WEBP · max 4 MB</p>
+
+            <!-- Preview -->
+            <div class="mb-4">
+                <img id="profile-preview"
+                     src="{{ app.user.profilePicture ? asset('uploads/profile_pictures/' ~ app.user.profilePicture) : asset('img/default-avatar-profile-vector-user-profile.webp') }}"
+                     alt="Profile Preview"
+                     class="w-24 h-24 rounded-full object-cover border-2 border-gray-300">
             </div>
 
-            <!-- User Name -->
-            <h2 class="text-2xl font-bold text-gray-900 mb-2">
-                {{ app.user.firstName }} {{ app.user.lastName }}
-            </h2>
+            <!-- Form -->
+            {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'class': 'w-full'}}) }}
 
-            <!-- Email -->
-            <p class="text-gray-500 mb-6">{{ app.user.email }}</p>
+            <label for="{{ form.profilePicture.vars.id }}"
+                   class="block w-full border-2 border-dashed border-gray-300 rounded-lg cursor-pointer p-4 text-center hover:border-gray-400 transition text-sm text-gray-500">
+                {{ form_widget(form.profilePicture, {
+                    'attr': {
+                        'class': 'hidden',
+                        'onchange': "let file = this.files[0]; if(file){ document.getElementById('profile-preview').src = window.URL.createObjectURL(file); }"
+                    }
+                }) }}
+                Klik of sleep een bestand om te uploaden
+            </label>
 
-            <!-- Action Buttons -->
-            <div class="flex justify-center gap-4">
-                <a href="{{ path('app_profile') }}"
-                   class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow transition">
-                    Edit Profile
-                </a>
-                <a href="{{ path('app_change_password') }}"
-                   class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg shadow transition">
-                    Change Password
-                </a>
-            </div>
+            <button type="submit"
+                    class="w-full mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow transition text-sm">
+                Upload & vervang
+            </button>
 
+            {{ form_end(form) }}
         </div>
     </div>
 {% endblock %}
