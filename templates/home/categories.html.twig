@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% for category in categories %}
+        <div class="category-item">
+            <h2>{{ category.name }}</h2>
+        </div>
+    {% endfor %}
+{% endblock %}
+

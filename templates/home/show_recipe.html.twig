@@ -1,0 +1,109 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ recipe.title }}{% endblock %}
+
+{% block body %}
+    <div class="max-w-5xl mx-auto px-6 py-10">
+
+        {# HEADER WITH IMAGE #}
+        <div class="relative rounded-2xl overflow-hidden shadow-lg mb-10">
+            {% if recipe.images %}
+                <img src="{{ recipe.images }}"
+                     alt="{{ recipe.title }}"
+                     class="w-full h-72 object-cover">
+            {% else %}
+                <div class="w-full h-72 bg-gray-200 flex items-center justify-center text-gray-500 italic">
+                    No Image Available
+                </div>
+            {% endif %}
+
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+
+            <div class="absolute bottom-4 left-6">
+                <h1 class="text-4xl font-extrabold text-white drop-shadow-lg">
+                    {{ recipe.title }}
+                </h1>
+
+                <div class="mt-3 flex gap-3 items-center">
+
+                    {# CATEGORY #}
+                    {% if recipe.categories %}
+                        <span class="bg-blue-200 text-blue-800 font-semibold px-3 py-1 text-xs rounded-full">
+                        {{ recipe.categories.name }}
+                    </span>
+                    {% endif %}
+
+                    {# DIFFICULTY #}
+                    <span class="bg-yellow-300 text-yellow-900 font-bold px-3 py-1 text-xs uppercase rounded-full">
+                    {{ recipe.difficulty }}
+                </span>
+
+                </div>
+            </div>
+        </div>
+
+        {# MAIN CONTENT #}
+        <div class="bg-white shadow-md rounded-2xl p-8 border border-gray-200">
+
+            {# TIMES #}
+            <div class="grid grid-cols-3 gap-6 text-center mb-10">
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <p class="text-gray-500 text-sm">Prep Time</p>
+                    <p class="text-xl font-semibold text-gray-800">{{ recipe.prepTimeMin }} min</p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <p class="text-gray-500 text-sm">Cook Time</p>
+                    <p class="text-xl font-semibold text-gray-800">{{ recipe.cookTimeMin }} min</p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <p class="text-gray-500 text-sm">Total Time</p>
+                    <p class="text-xl font-semibold text-gray-800">{{ recipe.totalTimeMin }} min</p>
+                </div>
+            </div>
+
+            {# DESCRIPTION #}
+            <div class="mb-10">
+                <h2 class="text-2xl font-bold text-gray-800 mb-3">Description</h2>
+                <p class="text-gray-700 leading-relaxed whitespace-pre-line">
+                    {{ recipe.description }}
+                </p>
+            </div>
+
+            {# SERVINGS #}
+            <div class="mb-10">
+                <h2 class="text-2xl font-bold text-gray-800 mb-3">Servings</h2>
+                <p class="text-lg font-medium text-gray-600">🍽 {{ recipe.servings }} servings</p>
+            </div>
+
+            {# TAGS #}
+            {% if recipe.recipeTags|length > 0 %}
+                <div class="mb-10">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-3">Tags</h2>
+                    <div class="flex flex-wrap gap-2">
+                        {% for tag in recipe.recipeTags %}
+                            <span class="px-3 py-1 bg-green-100 text-green-700 text-sm rounded-md">
+                            #{{ tag.name }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {# DATES #}
+            <div class="text-sm text-gray-500 border-t pt-4">
+                <p>Created: {{ recipe.createdAt|date('d M Y, H:i') }}</p>
+                <p>Updated: {{ recipe.updatedAt|date('d M Y, H:i') }}</p>
+            </div>
+
+        </div>
+
+        {# BACK BUTTON #}
+        <div class="mt-8 text-center">
+            <a href="{{ path('app_recipes') }}"
+               class="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
+                ← Back to Recipes
+            </a>
+        </div>
+
+    </div>
+{% endblock %}

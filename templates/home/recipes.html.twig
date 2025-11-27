@@ -1,0 +1,164 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Recipes{% endblock %}
+
+{% block body %}
+    <div class="max-w-7xl mx-auto py-12 px-6">
+
+        <h1 class="text-4xl font-extrabold text-gray-900 text-center mb-8">
+            Discover Delicious Recipes
+        </h1>
+
+        {# Top Controls: Add Recipe Button + Category Dropdown #}
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+            {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_make_recipe') }}"
+               class="px-4 py-2 bg-gradient-to-br from-green-400 to-blue-600
+                  hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200
+                  font-medium rounded-xl text-white shadow transition">
+                Maak Recipe
+            </a>
+            {% endif %}
+
+            {# Custom Category Dropdown #}
+            <div class="relative w-full sm:w-64">
+                <button id="dropdownButton"
+                        class="w-full text-left px-4 py-2 rounded-xl border border-gray-300 bg-white text-gray-900 shadow-sm hover:bg-gray-100 focus:outline-none">
+                    All Categories
+                </button>
+                <div id="dropdownMenu" class="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg hidden max-h-60 overflow-y-auto">
+                    <div class="px-4 py-2 cursor-pointer hover:bg-gray-100 text-gray-900" data-id="all">
+                        All Categories
+                    </div>
+                    {% for category in categories %}
+                        <div class="px-4 py-2 cursor-pointer hover:bg-gray-100 text-gray-900" data-id="{{ category.id }}">
+                            {{ category.name }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        {% if recipes is empty %}
+            <p class="text-center text-gray-600 text-lg">No recipes found.</p>
+        {% else %}
+            <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+
+                {% for recipe in recipes %}
+                    <a href="{{ path('app_show_recipe', { recipe: recipe.id }) }}"
+                       class="block bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-200
+                          hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group">
+
+                        {# IMAGE #}
+                        {% if recipe.images %}
+                            <img src="{{ recipe.images }}"
+                                 alt="{{ recipe.title }}"
+                                 class="w-full h-56 object-cover group-hover:opacity-90 transition">
+                        {% else %}
+                            <div class="w-full h-56 bg-gray-200 flex items-center justify-center text-gray-500 italic">
+                                No Image
+                            </div>
+                        {% endif %}
+
+                        <div class="p-6">
+
+                            {# TITLE #}
+                            <h2 class="text-2xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition">
+                                {{ recipe.title }}
+                            </h2>
+
+                            {# CATEGORY BADGE #}
+                            {% if recipe.categories %}
+                                <span class="inline-block bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full mb-4">
+                                {{ recipe.categories.name }}
+                            </span>
+                            {% endif %}
+
+                            {# DESCRIPTION PREVIEW #}
+                            <p class="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-4">
+                                {{ recipe.description }}
+                            </p>
+
+                            {# TIME INFO #}
+                            <div class="grid grid-cols-3 gap-4 text-center text-sm font-medium text-gray-700 mb-4">
+                                <div>
+                                    <p class="text-gray-500 text-xs">Prep</p>
+                                    {{ recipe.prepTimeMin }} min
+                                </div>
+                                <div>
+                                    <p class="text-gray-500 text-xs">Cook</p>
+                                    {{ recipe.cookTimeMin }} min
+                                </div>
+                                <div>
+                                    <p class="text-gray-500 text-xs">Total</p>
+                                    {{ recipe.totalTimeMin }} min
+                                </div>
+                            </div>
+
+                            {# SERVINGS + DIFFICULTY #}
+                            <div class="flex items-center justify-between mt-2">
+                            <span class="text-gray-700 bg-gray-100 px-3 py-1 rounded-lg text-xs font-medium">
+                                🍽 {{ recipe.servings }} servings
+                            </span>
+                                <span class="bg-yellow-200 text-yellow-800 px-3 py-1 rounded-lg text-xs font-bold uppercase">
+                                {{ recipe.difficulty }}
+                            </span>
+                            </div>
+
+                            {# TAGS #}
+                            {% if recipe.recipeTags|length > 0 %}
+                                <div class="mt-4 flex flex-wrap gap-2">
+                                    {% for tag in recipe.recipeTags %}
+                                        <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-md">
+                                        #{{ tag.name }}
+                                    </span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    {# JS for custom dropdown and filter #}
+    <script>
+        const dropdownButton = document.getElementById('dropdownButton');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        const dropdownItems = dropdownMenu.querySelectorAll('div');
+        const cards = document.querySelectorAll('.group');
+
+        dropdownButton.addEventListener('click', () => {
+            dropdownMenu.classList.toggle('hidden');
+        });
+
+        dropdownItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const categoryName = item.textContent.trim();
+                dropdownButton.textContent = categoryName;
+                dropdownMenu.classList.add('hidden');
+
+                if(categoryName === 'All Categories') {
+                    cards.forEach(card => card.style.display = 'block');
+                } else {
+                    cards.forEach(card => {
+                        const cardCategory = card.querySelector('span')?.textContent || '';
+                        if (cardCategory.includes(categoryName)) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                }
+            });
+        });
+
+        // Click outside closes dropdown
+        document.addEventListener('click', (e) => {
+            if (!dropdownButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.classList.add('hidden');
+            }
+        });
+    </script>
+{% endblock %}

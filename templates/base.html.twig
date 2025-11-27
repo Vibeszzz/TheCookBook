@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}TheCookingBook{% endblock %}</title>
+    <link rel="icon"
+          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+    {% block stylesheets %}
+    {% endblock %}
+
+    {% block javascripts %}
+        {% block importmap %}{{ importmap('app') }}{% endblock %}
+    {% endblock %}
+</head>
+<body>
+<header class="flex justify-center mt-6">
+    <nav class="bg-gradient-to-r from-green-400 via-blue-400 to-purple-500
+                dark:from-gray-800 dark:via-gray-900 dark:to-black
+                border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg px-6 py-3
+                flex items-center justify-between w-full max-w-4xl transform transition-all hover:scale-105">
+
+        <!-- Logo -->
+        <div class="text-xl font-extrabold text-white dark:text-gray-100 flex items-center gap-2">
+            <img src="{{ asset('img/sud logo.png') }}" alt="Logo" class="w-6 h-6">
+            <span>MyCookBook</span>
+        </div>
+
+        <!-- Desktop Links -->
+        <ul class="hidden md:flex space-x-6 items-center">
+            <li>
+                <a href="{{ path('app_home') }}"
+                   class="text-white dark:text-gray-200 font-medium px-3 py-1 rounded-lg hover:bg-white/20 dark:hover:bg-gray-700 transition flex items-center gap-1">
+                    <img src="https://img.icons8.com/ios-filled/24/ffffff/home.png" class="w-4 h-4"/>
+                    Home
+                </a>
+            </li>
+            <li>
+                <a href="{{ path('app_comments') }}"
+                   class="text-white dark:text-gray-200 font-medium px-3 py-1 rounded-lg hover:bg-white/20 dark:hover:bg-gray-700 transition flex items-center gap-1">
+                    <img src="https://img.icons8.com/ios-filled/24/ffffff/comments.png" class="w-4 h-4"/>
+                    Comments
+                </a>
+            </li>
+            <li>
+                <a href="{{ path('app_recipes') }}"
+                   class="text-white dark:text-gray-200 font-medium px-3 py-1 rounded-lg hover:bg-white/20 dark:hover:bg-gray-700 transition flex items-center gap-1">
+                    <img src="https://img.icons8.com/ios-filled/24/ffffff/recipe-book.png" class="w-4 h-4"/>
+                    Recipes
+                </a>
+            </li>
+        </ul>
+
+        <!-- Dark Mode Toggle -->
+        <div class="flex items-center space-x-2 mr-4">
+            <label class="inline-flex items-center relative w-[110px] h-[50px] cursor-pointer" for="toggle">
+                <input class="peer hidden" id="toggle" type="checkbox"/>
+                <div class="relative w-[110px] h-[50px] bg-white peer-checked:bg-zinc-500 rounded-full
+                            after:absolute after:content-[''] after:w-[40px] after:h-[40px]
+                            after:bg-gradient-to-r from-orange-500 to-yellow-400
+                            peer-checked:after:from-zinc-900 peer-checked:after:to-zinc-900
+                            after:rounded-full after:top-[5px] after:left-[5px]
+                            active:after:w-[50px] peer-checked:after:left-[105px]
+                            peer-checked:after:translate-x-[-100%] shadow-sm duration-300 after:duration-300 after:shadow-md"></div>
+            </label>
+        </div>
+
+        <!-- Profile Dropdown -->
+        <div class="relative md:flex md:items-center">
+
+            {% if app.user %}
+                <!-- Profile Button -->
+                <div class="group relative">
+                    <button type="button"
+                            class="flex items-center text-sm rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+                            aria-expanded="false">
+                        <span class="sr-only">Open user menu</span>
+                        {% if app.user.profilePicture %}
+                            <img class="w-8 h-8 rounded-full"
+                                 src="{{ asset('uploads/profile_pictures/' ~ app.user.profilePicture) }}"
+                                 alt="Profile Picture">
+                        {% else %}
+                            <img class="w-8 h-8 rounded-full bg-white"
+                                 src="{{ asset('img/default-avatar-profile-vector-user-profile.png') }}"
+                                 alt="No picture">
+                        {% endif %}
+                    </button>
+
+                    <!-- Dropdown Menu (desktop hover) -->
+                    <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg py-2
+                        opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 flex flex-col">
+                        <div class="px-4 py-3">
+                            <span class="block text-sm text-gray-900 dark:text-white">{{ app.user.firstName }} {{ app.user.lastName }}</span>
+                            <span class="block text-sm text-gray-500 dark:text-gray-400 truncate">{{ app.user.email }}</span>
+                        </div>
+                        <ul class="py-2">
+                            <li>
+                                <a href="{{ path('app_recipes') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">👤 Profiel</a>
+                            </li>
+                            <li>
+                                <a href="{{ path('app_recipes') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">✉️ Inbox</a>
+                            </li>
+                            <li>
+                                <a href="{{ path('app_recipes') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">🌱 Persoonlijke Groei</a>
+                            </li>
+                            <li>
+                                <a href="{{ path('app_logout') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">🚪 Uitloggen</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Toggle -->
+                <div class="md:hidden relative">
+                    <input type="checkbox" id="profile-menu-toggle" class="peer hidden">
+                    <label for="profile-menu-toggle" class="cursor-pointer flex items-center">
+                        <img class="w-8 h-8 rounded-full"
+                             src="{{ app.user.profilePicture ? asset('uploads/profile_picture/' ~ app.user.profilePicture) : asset('img/default-avatar-profile-vector-user-profile.png') }}"
+                             alt="Profile">
+                    </label>
+                    <div class="peer-checked:flex hidden flex-col absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg z-10">
+                        <ul class="py-2">
+                            <li><a href="{{ path('app_recipes') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">👤 Profiel</a></li>
+                            <li><a href="{{ path('app_recipes') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">✉️ Inbox</a></li>
+                            <li><a href="{{ path('app_logout') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">🚪 Uitloggen</a></li>
+                        </ul>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{{ path('app_login') }}"
+                   class="flex items-center space-x-1 bg-white/20 dark:bg-gray-700 text-white dark:text-gray-200 px-3 py-1 rounded-lg hover:bg-white/40 dark:hover:bg-gray-600 transition">
+                    <img src="https://img.icons8.com/ios-glyphs/30/ffffff/login-rounded-right.png" class="w-5 h-5" alt="Login">
+                    <span>Login</span>
+                </a>
+            {% endif %}
+        </div>
+    </nav>
+</header>
+{% block body %}{% endblock %}
+</body>
+</html>
