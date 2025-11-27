@@ -36,9 +36,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var string The hashed password
      */
-    #[Assert\NotBlank(
-        message: 'Password should not be blank'
-    )]
+
     #[ORM\Column]
     private ?string $password = null;
 

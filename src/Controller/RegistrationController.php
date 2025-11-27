@@ -24,13 +24,17 @@ class RegistrationController extends AbstractController
             /** @var string $plainPassword */
             $plainPassword = $form->get('plainPassword')->getData();
 
-            // encode the plain password
-            $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
+            if ($plainPassword) {
+                $hashed = $userPasswordHasher->hashPassword($user, $plainPassword);
+                $user->setPassword($hashed);
+            } else {
+                // This should never happen if validation is working
+                $this->addFlash('error', 'Password cannot be empty');
+                return $this->redirectToRoute('app_register');
+            }
 
             $entityManager->persist($user);
             $entityManager->flush();
-
-            // do anything else you need here, like send an email
 
             return $this->redirectToRoute('app_home');
         }
