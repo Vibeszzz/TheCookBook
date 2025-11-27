@@ -51,7 +51,7 @@
 
                         {# IMAGE #}
                         {% if recipe.images %}
-                            <img src="{{ recipe.images }}"
+                            <img src="{{ asset('uploads/recipes/' ~ recipe.images) }}"
                                  alt="{{ recipe.title }}"
                                  class="w-full h-56 object-cover group-hover:opacity-90 transition">
                         {% else %}

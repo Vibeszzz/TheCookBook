@@ -1,7 +1,5 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Add/Edit Recipe{% endblock %}
-
 {% block body %}
     <div class="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white py-8 px-4 sm:px-6 lg:px-8">
         <div class="w-full max-w-2xl bg-white p-8 rounded-2xl shadow-2xl border border-gray-200 space-y-6">
@@ -48,59 +46,41 @@
                     </div>
                 </div>
 
-                <!-- Total Time & Servings -->
+                <!-- Servings & Difficulty -->
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-gray-700 font-medium mb-1" for="{{ form.servings.vars.id }}">Servings</label>
                         {{ form_widget(form.servings, {'attr': {'class': 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'}}) }}
                         {{ form_errors(form.servings, {'attr': {'class': 'text-red-600 text-xs mt-1'}}) }}
                     </div>
-                </div>
-
-                <!-- Difficulty with Badge -->
-                <div>
-                    <label class="block text-gray-700 font-medium mb-1" for="{{ form.difficulty.vars.id }}">Difficulty</label>
-                    <div class="relative">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1" for="{{ form.difficulty.vars.id }}">Difficulty</label>
                         {{ form_widget(form.difficulty, {'attr': {'class': 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'}}) }}
-                        <span class="absolute right-3 top-3 text-sm font-semibold text-gray-500">
-                        <!-- Optional gamification: display badge based on value -->
-                        {% if form.difficulty.vars.value == 'Easy' %}
-                            🟢 Easy
-                        {% elseif form.difficulty.vars.value == 'Medium' %}
-                            🟡 Medium
-                        {% elseif form.difficulty.vars.value == 'Hard' %}
-                            🔴 Hard
-                        {% endif %}
-                    </span>
+                        {{ form_errors(form.difficulty, {'attr': {'class': 'text-red-600 text-xs mt-1'}}) }}
                     </div>
-                    {{ form_errors(form.difficulty, {'attr': {'class': 'text-red-600 text-xs mt-1'}}) }}
                 </div>
 
-                <!-- Images -->
+                <!-- Image Upload -->
                 <div>
-                    <label class="block text-gray-700 font-medium mb-1" for="{{ form.images.vars.id }}">Images (URLs)</label>
+                    <label class="block text-gray-700 font-medium mb-1" for="{{ form.images.vars.id }}">Upload Image</label>
                     {{ form_widget(form.images, {'attr': {'class': 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'}}) }}
                     {{ form_errors(form.images, {'attr': {'class': 'text-red-600 text-xs mt-1'}}) }}
+                    <p class="text-gray-400 text-xs mt-1">Images will be stored in public/uploads/recipes</p>
                 </div>
 
-                <!-- Categories -->
+                <!-- Categories Dropdown -->
                 <div>
                     <label class="block text-gray-700 font-medium mb-1" for="{{ form.categories.vars.id }}">Category</label>
                     {{ form_widget(form.categories, {'attr': {'class': 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'}}) }}
                     {{ form_errors(form.categories, {'attr': {'class': 'text-red-600 text-xs mt-1'}}) }}
                 </div>
 
-                <!-- Tags -->
+                <!-- Tags Multi-Select -->
                 <div>
                     <label class="block text-gray-700 font-medium mb-1" for="{{ form.recipeTags.vars.id }}">Tags</label>
-                    {{ form_widget(form.recipeTags, {'attr': {'class': 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'}}) }}
+                    {{ form_widget(form.recipeTags, {'attr': {'class': 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500', 'multiple': true}}) }}
                     {{ form_errors(form.recipeTags, {'attr': {'class': 'text-red-600 text-xs mt-1'}}) }}
                 </div>
-            </div>
-
-            <!-- Gamification: Progress Bar Example -->
-            <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
-                <div class="bg-green-500 h-2 rounded-full" style="width: {{ (form.vars.value|length / 10) * 100 }}%"></div>
             </div>
 
             <!-- Submit Button -->

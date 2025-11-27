@@ -68,65 +68,58 @@
 
         <!-- Profile Dropdown -->
         <div class="relative md:flex md:items-center">
-
             {% if app.user %}
-                <!-- Profile Button -->
-                <div class="group relative">
-                    <button type="button"
-                            class="flex items-center text-sm rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
-                            aria-expanded="false">
-                        <span class="sr-only">Open user menu</span>
+                <!-- Profile Button (Click to toggle dropdown) -->
+                <div class="relative">
+                    <input type="checkbox" id="profile-menu-toggle" class="peer hidden">
+                    <label for="profile-menu-toggle" class="flex items-center cursor-pointer">
                         {% if app.user.profilePicture %}
-                            <img class="w-8 h-8 rounded-full"
+                            <img class="w-8 h-8 rounded-full border-2 border-gray-300"
                                  src="{{ asset('uploads/profile_pictures/' ~ app.user.profilePicture) }}"
                                  alt="Profile Picture">
                         {% else %}
-                            <img class="w-8 h-8 rounded-full bg-white"
+                            <img class="w-8 h-8 rounded-full bg-white border-2 border-gray-300"
                                  src="{{ asset('img/default-avatar-profile-vector-user-profile.png') }}"
                                  alt="No picture">
                         {% endif %}
-                    </button>
+                    </label>
 
-                    <!-- Dropdown Menu (desktop hover) -->
+                    <!-- Dropdown Menu -->
                     <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg py-2
-                        opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 flex flex-col">
-                        <div class="px-4 py-3">
+                        opacity-0 invisible peer-checked:opacity-100 peer-checked:visible transition-all duration-200 z-10 flex flex-col">
+                        <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-600">
                             <span class="block text-sm text-gray-900 dark:text-white">{{ app.user.firstName }} {{ app.user.lastName }}</span>
                             <span class="block text-sm text-gray-500 dark:text-gray-400 truncate">{{ app.user.email }}</span>
                         </div>
                         <ul class="py-2">
                             <li>
-                                <a href="{{ path('app_recipes') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">👤 Profiel</a>
+                                <a href="{{ path('app_profile') }}"
+                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
+                                    👤 Profiel
+                                </a>
                             </li>
                             <li>
-                                <a href="{{ path('app_recipes') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">✉️ Inbox</a>
+                                <a href="{{ path('app_recipes') }}"
+                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
+                                    ✉️ Inbox
+                                </a>
                             </li>
                             <li>
-                                <a href="{{ path('app_recipes') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">🌱 Persoonlijke Groei</a>
+                                <a href="{{ path('app_recipes') }}"
+                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
+                                    🌱 Persoonlijke Groei
+                                </a>
                             </li>
                             <li>
-                                <a href="{{ path('app_logout') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">🚪 Uitloggen</a>
+                                <a href="{{ path('app_logout') }}"
+                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
+                                    🚪 Uitloggen
+                                </a>
                             </li>
                         </ul>
                     </div>
                 </div>
 
-                <!-- Mobile Menu Toggle -->
-                <div class="md:hidden relative">
-                    <input type="checkbox" id="profile-menu-toggle" class="peer hidden">
-                    <label for="profile-menu-toggle" class="cursor-pointer flex items-center">
-                        <img class="w-8 h-8 rounded-full"
-                             src="{{ app.user.profilePicture ? asset('uploads/profile_picture/' ~ app.user.profilePicture) : asset('img/default-avatar-profile-vector-user-profile.png') }}"
-                             alt="Profile">
-                    </label>
-                    <div class="peer-checked:flex hidden flex-col absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg z-10">
-                        <ul class="py-2">
-                            <li><a href="{{ path('app_recipes') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">👤 Profiel</a></li>
-                            <li><a href="{{ path('app_recipes') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">✉️ Inbox</a></li>
-                            <li><a href="{{ path('app_logout') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">🚪 Uitloggen</a></li>
-                        </ul>
-                    </div>
-                </div>
             {% else %}
                 <a href="{{ path('app_login') }}"
                    class="flex items-center space-x-1 bg-white/20 dark:bg-gray-700 text-white dark:text-gray-200 px-3 py-1 rounded-lg hover:bg-white/40 dark:hover:bg-gray-600 transition">
@@ -134,6 +127,7 @@
                     <span>Login</span>
                 </a>
             {% endif %}
+
         </div>
     </nav>
 </header>

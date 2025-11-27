@@ -8,6 +8,7 @@ use App\Entity\Tags;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -22,7 +23,12 @@ class RecipeFormType extends AbstractType
             ->add('cookTimeMin')
             ->add('servings')
             ->add('difficulty')
-            ->add('images')
+            ->add('images', FileType::class, [
+                'label' => 'Recipe Image',
+                'mapped' => false,        // not automatically stored in entity
+                'required' => false,      // optional
+                'attr' => ['accept' => 'image/*'],
+            ])
             ->add('categories', EntityType::class, [
                 'class' => Categories::class,
                 'choice_label' => 'name',

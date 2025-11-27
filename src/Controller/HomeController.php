@@ -6,12 +6,14 @@ use App\Entity\Categories;
 use App\Entity\Comments;
 use App\Entity\Recipe;
 use App\Form\CategoryFormType;
+use App\Form\PasswordResetFormType;
 use App\Form\RecipeFormType;
 use App\Repository\RecipeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -52,17 +54,33 @@ final class HomeController extends AbstractController
     {
         $form = $this->createForm(RecipeFormType::class);
         $form->handleRequest($request);
+
         if ($form->isSubmitted() && $form->isValid()) {
             $recipe = $form->getData();
             $recipe->setUserRecipe($this->getUser());
+
+            // Calculate total time
             $totalTime = $recipe->getPrepTimeMin() + $recipe->getCookTimeMin();
             $recipe->setTotalTimeMin($totalTime);
+
             $recipe->setCreatedAt(new \DateTimeImmutable());
             $recipe->setUpdatedAt(new \DateTimeImmutable());
+
+            // Handle uploaded image
+            $imageFile = $form->get('images')->getData(); // 'images' is the FileType in the form
+            if ($imageFile) {
+                $newFilename = uniqid() . '.' . $imageFile->guessExtension();
+                $imageFile->move(
+                    $this->getParameter('recipes_directory'), // make sure this exists in config/services.yaml
+                    $newFilename
+                );
+                $recipe->setImages($newFilename);
+            }
+
             $entityManager->persist($recipe);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Het boek is toegevoegd');
+            $this->addFlash('success', 'Het recept is toegevoegd');
 
             return $this->redirectToRoute('app_recipes');
         }
@@ -79,6 +97,45 @@ final class HomeController extends AbstractController
         $recipes = $entityManager->getRepository(Recipe::class)->find($recipe);
         return $this->render('home/show_recipe.html.twig', [
             'recipe' => $recipes,
+        ]);
+    }
+
+    #[Route('/profile', name: 'app_profile')]
+    public function profile(): Response
+    {
+        return $this->render('home/profile.html.twig', [
+            'controller_name' => 'HomeController',
+        ]);
+    }
+
+    #[Route('/home/profile/change-password', name: 'app_change_password')]
+    public function changePassword(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $form = $this->createForm(PasswordResetFormType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $plainPassword = $form->get('plainPassword')->getData();
+
+            // Hash and set the new password
+            $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
+            $user->setPassword($hashedPassword);
+
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Wachtwoord succesvol gewijzigd.');
+
+            return $this->redirectToRoute('app_profile');
+        }
+
+        return $this->render('home/change_password.html.twig', [
+            'form' => $form->createView(),
         ]);
     }
 }
