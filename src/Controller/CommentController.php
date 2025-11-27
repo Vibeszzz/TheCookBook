@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Comments;
+use App\Entity\Recipe;
 use App\Form\CommentFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,13 +23,15 @@ final class CommentController extends AbstractController
         ]);
     }
 
-    #[Route('/make/comment', name: 'app_make_comment')]
-    public function newComment(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/make/comment/{recipe}', name: 'app_make_comment')]
+    public function newComment(Request $request, EntityManagerInterface $entityManager, Recipe $recipe): Response
     {
+
         $form = $this->createForm(CommentFormType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $comment = $form->getData();
+            $comment->setRecipeComments($recipe);
             $comment->setUserComments($this->getUser());
             $comment->setCreatedAt(new \DateTimeImmutable());
             $entityManager->persist($comment);

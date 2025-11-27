@@ -8,7 +8,7 @@
         {# HEADER WITH IMAGE #}
         <div class="relative rounded-2xl overflow-hidden shadow-lg mb-10">
             {% if recipe.images %}
-                <img src="{{ recipe.images }}"
+                <img src="{{ asset('uploads/recipes/' ~ recipe.images) }}"
                      alt="{{ recipe.title }}"
                      class="w-full h-72 object-cover">
             {% else %}
@@ -25,76 +25,120 @@
                 </h1>
 
                 <div class="mt-3 flex gap-3 items-center">
-
-                    {# CATEGORY #}
                     {% if recipe.categories %}
                         <span class="bg-blue-200 text-blue-800 font-semibold px-3 py-1 text-xs rounded-full">
                         {{ recipe.categories.name }}
                     </span>
                     {% endif %}
 
-                    {# DIFFICULTY #}
                     <span class="bg-yellow-300 text-yellow-900 font-bold px-3 py-1 text-xs uppercase rounded-full">
                     {{ recipe.difficulty }}
                 </span>
-
                 </div>
             </div>
         </div>
 
-        {# MAIN CONTENT #}
-        <div class="bg-white shadow-md rounded-2xl p-8 border border-gray-200">
+        {# TWO-COLUMN LAYOUT #}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-            {# TIMES #}
-            <div class="grid grid-cols-3 gap-6 text-center mb-10">
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <p class="text-gray-500 text-sm">Prep Time</p>
-                    <p class="text-xl font-semibold text-gray-800">{{ recipe.prepTimeMin }} min</p>
-                </div>
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <p class="text-gray-500 text-sm">Cook Time</p>
-                    <p class="text-xl font-semibold text-gray-800">{{ recipe.cookTimeMin }} min</p>
-                </div>
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <p class="text-gray-500 text-sm">Total Time</p>
-                    <p class="text-xl font-semibold text-gray-800">{{ recipe.totalTimeMin }} min</p>
-                </div>
-            </div>
+            {# LEFT: MAIN DETAILS #}
+            <div class="lg:col-span-2 bg-white shadow-md rounded-2xl p-8 border border-gray-200">
 
-            {# DESCRIPTION #}
-            <div class="mb-10">
-                <h2 class="text-2xl font-bold text-gray-800 mb-3">Description</h2>
-                <p class="text-gray-700 leading-relaxed whitespace-pre-line">
-                    {{ recipe.description }}
-                </p>
-            </div>
-
-            {# SERVINGS #}
-            <div class="mb-10">
-                <h2 class="text-2xl font-bold text-gray-800 mb-3">Servings</h2>
-                <p class="text-lg font-medium text-gray-600">🍽 {{ recipe.servings }} servings</p>
-            </div>
-
-            {# TAGS #}
-            {% if recipe.recipeTags|length > 0 %}
-                <div class="mb-10">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-3">Tags</h2>
-                    <div class="flex flex-wrap gap-2">
-                        {% for tag in recipe.recipeTags %}
-                            <span class="px-3 py-1 bg-green-100 text-green-700 text-sm rounded-md">
-                            #{{ tag.name }}
-                        </span>
-                        {% endfor %}
+                {# TIMES #}
+                <div class="grid grid-cols-3 gap-6 text-center mb-10">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="text-gray-500 text-sm">Prep Time</p>
+                        <p class="text-xl font-semibold text-gray-800">{{ recipe.prepTimeMin }} min</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="text-gray-500 text-sm">Cook Time</p>
+                        <p class="text-xl font-semibold text-gray-800">{{ recipe.cookTimeMin }} min</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="text-gray-500 text-sm">Total Time</p>
+                        <p class="text-xl font-semibold text-gray-800">{{ recipe.totalTimeMin }} min</p>
                     </div>
                 </div>
-            {% endif %}
 
-            {# DATES #}
-            <div class="text-sm text-gray-500 border-t pt-4">
-                <p>Created: {{ recipe.createdAt|date('d M Y, H:i') }}</p>
-                <p>Updated: {{ recipe.updatedAt|date('d M Y, H:i') }}</p>
+                {# DESCRIPTION #}
+                <div class="mb-10">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-3">Description</h2>
+                    <p class="text-gray-700 leading-relaxed whitespace-pre-line">
+                        {{ recipe.description }}
+                    </p>
+                </div>
+
+                {# SERVINGS #}
+                <div class="mb-10">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-3">Servings</h2>
+                    <p class="text-lg font-medium text-gray-600">🍽 {{ recipe.servings }} servings</p>
+                </div>
+
+                {# TAGS #}
+                {% if recipe.recipeTags|length > 0 %}
+                    <div class="mb-10">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-3">Tags</h2>
+                        <div class="flex flex-wrap gap-2">
+                            {% for tag in recipe.recipeTags %}
+                                <span class="px-3 py-1 bg-green-100 text-green-700 text-sm rounded-md">
+                                #{{ tag.name }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {# DATES #}
+                <div class="text-sm text-gray-500 border-t pt-4">
+                    <p>Created: {{ recipe.createdAt|date('d M Y, H:i') }}</p>
+                    <p>Updated: {{ recipe.updatedAt|date('d M Y, H:i') }}</p>
+                    added by {{ recipe.userRecipe.firstName }} {{ recipe.userRecipe.lastName }}
+                    at {{ recipe.userRecipe.email }}
+                    <a href="{{ path('app_delete_recipe', {recipe: recipe.id}) }}">Delete recipe</a>
+                </div>
+
             </div>
 
+            {# RIGHT: INSTRUCTIONS #}
+            <div class="bg-white shadow-md rounded-2xl p-6 border border-gray-200">
+                <h2 class="text-2xl font-bold mb-4">Step-by-Step Instructions</h2>
+{#                {% if recipe.instructions|length > 0 %}#}
+                    <ol class="list-decimal list-inside space-y-2 text-gray-700">
+{#                        {% for step in recipe.instructions %}#}
+{#                            <li>{{ step }}</li>#}
+{#                        {% endfor %}#}
+                    </ol>
+{#                {% else %}#}
+                    <p class="text-gray-500 italic">No instructions provided.</p>
+{#                {% endif %}#}
+            </div>
+
+        </div>
+
+        {# COMMENTS CARD - BELOW THE TWO COLUMNS #}
+        <div class="bg-white shadow-md rounded-2xl p-6 border border-gray-200 mt-10">
+            <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold mb-4">Comments</h2>
+            <a href="{{ path('app_make_comment', {recipe: recipe.id}) }}"
+               class="inline-block text-white bg-gradient-to-br from-green-400 to-blue-600
+                  hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200
+                  font-medium rounded-xl text-sm px-4 py-2.5 text-center leading-5 transition">
+                Add Comment
+            </a>
+            </div>
+            {% if recipe.comments|length > 0 %}
+                <ul class="space-y-4">
+                    {% for comment in recipe.comments %}
+                        <li class="border-b pb-2">
+                            <p class="text-gray-800 font-semibold">{{ comment.userComments.firstName }} {{ comment.userComments.lastName }}</p>
+                            <p class="text-gray-600 text-sm">{{ comment.content }}</p>
+                            <p class="text-xs text-gray-400">{{ comment.createdAt|date('d M Y, H:i') }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-gray-500 italic">No comments yet.</p>
+            {% endif %}
         </div>
 
         {# BACK BUTTON #}

@@ -3,19 +3,15 @@
 namespace App\Controller;
 
 use App\Entity\Categories;
-use App\Entity\Comments;
 use App\Entity\Recipe;
-use App\Form\CategoryFormType;
 use App\Form\EditProfileFormType;
 use App\Form\PasswordResetFormType;
 use App\Form\RecipeFormType;
 use App\Form\UploadProfilePictureFormType;
-use App\Repository\RecipeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use http\Client\Curl\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -27,10 +23,13 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 final class HomeController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
-    public function index(): Response
+    public function index(EntityManagerInterface $entityManager): Response
     {
+
+        $recipes = $entityManager->getRepository(Recipe::class)->findAll();
+
         return $this->render('home/index.html.twig', [
-            'controller_name' => 'HomeController',
+            'recipes' => $recipes,
         ]);
     }
 
@@ -207,16 +206,34 @@ final class HomeController extends AbstractController
 
         if ($user) {
 
-            // 1. Log the user out before deletion
+            // 1. Log out the user before deleting the account
             $tokenStorage->setToken(null);
             $request->getSession()->invalidate();
 
-            // 2. Delete the user
+            // 2. Delete the user entity
             $entityManager->remove($user);
             $entityManager->flush();
 
             $this->addFlash('success', 'Profiel succesvol verwijderd.');
         }
+
         return $this->redirectToRoute('app_home');
+    }
+
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/home/recipe/delete/{recipe}', name: 'app_delete_recipe')]
+    public function deleteRecipe(Request $request, EntityManagerInterface $entityManager, Recipe $recipe): Response
+    {
+        // Remove each comment individually
+        foreach ($recipe->getComments() as $comment) {
+            $entityManager->remove($comment);
+        }
+
+        $entityManager->remove($recipe);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Recept succesvol verwijderd.');
+        return $this->redirectToRoute('app_recipes');
     }
 }
