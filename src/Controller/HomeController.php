@@ -6,11 +6,13 @@ use App\Entity\Categories;
 use App\Entity\Comments;
 use App\Entity\Recipe;
 use App\Form\CategoryFormType;
+use App\Form\EditProfileFormType;
 use App\Form\PasswordResetFormType;
 use App\Form\RecipeFormType;
 use App\Form\UploadProfilePictureFormType;
 use App\Repository\RecipeRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use http\Client\Curl\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -18,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
@@ -104,6 +107,7 @@ final class HomeController extends AbstractController
         ]);
     }
 
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     #[Route('/profile', name: 'app_profile')]
     public function profile(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
@@ -141,6 +145,7 @@ final class HomeController extends AbstractController
         ]);
     }
 
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     #[Route('/home/profile/change-password', name: 'app_change_password')]
     public function changePassword(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
     {
@@ -170,5 +175,48 @@ final class HomeController extends AbstractController
         return $this->render('home/change_password.html.twig', [
             'form' => $form->createView(),
         ]);
+    }
+
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[Route('/home/profile/edit', name: 'app_edit_profile')]
+    public function editProfile(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser();
+        $form = $this->createForm(EditProfileFormType::class, $user);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user = $form->getData();
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Profiel succesvol bijgewerkt.');
+
+            return $this->redirectToRoute('app_profile');
+        }
+
+        return $this->render('home/profile_edit.html.twig', [
+            'form' => $form
+        ]);
+    }
+
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[Route('/home/profile/delete', name: 'app_delete_profile')]
+    public function deleteProfile(Request $request, EntityManagerInterface $entityManager, TokenStorageInterface $tokenStorage): Response
+    {
+        $user = $this->getUser();
+
+        if ($user) {
+
+            // 1. Log the user out before deletion
+            $tokenStorage->setToken(null);
+            $request->getSession()->invalidate();
+
+            // 2. Delete the user
+            $entityManager->remove($user);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Profiel succesvol verwijderd.');
+        }
+        return $this->redirectToRoute('app_home');
     }
 }
